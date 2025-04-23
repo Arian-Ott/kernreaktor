@@ -9,3 +9,5 @@ coverage
 *.env
 
 .coverage
+
+htmlcov
