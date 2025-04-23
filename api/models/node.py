@@ -11,5 +11,7 @@ class Node(Base):
     cpus = Column(Integer, nullable=False)
     memory = Column(Integer, nullable=False)
     date_registered = Column(DateTime, nullable=False, default=datetime.now)
-
-
+    cluster_id = Column(Integer, ForeignKey("clusters.id"), nullable=True, ondelete="SET NULL", onupdate="CASCADE")
+    
+    
+    
