@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
-from config import settings
+from api.config import settings
 
 app = FastAPI(debug=settings.DEBUG)
 

@@ -12,7 +12,7 @@ import uuid
 
 def create_environment(db: Session, env_data: EnvironmentCreate) -> Environment:
     env = Environment(
-        id=str(uuid.uuid4()),
+        id=uuid.uuid4(),
         vmid=env_data.vmid,
         name=env_data.name,
         type=env_data.type,
@@ -46,7 +46,7 @@ def create_vm_config(
     boot_order: str,
 ) -> VMConfig:
     config = VMConfig(
-        id=str(uuid.uuid4()),
+        id=uuid.uuid4(),
         environment_id=environment_id,
         bios=bios,
         machine=machine,
@@ -64,7 +64,7 @@ def create_lxc_config(
     db: Session, environment_id: str, rootfs: str, mounts: str, features: str
 ) -> LXCConfig:
     config = LXCConfig(
-        id=str(uuid.uuid4()),
+        id=uuid.uuid4(),
         environment_id=environment_id,
         rootfs=rootfs,
         mounts=mounts,

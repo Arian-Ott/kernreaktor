@@ -1,21 +1,25 @@
 import pytest
-from fastapi.testclient import TestClient
-from unittest.mock import MagicMock
-from api.main import app
-from api.db import get_db
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from api.db import Base  # Adjust if you use a different base import
+from sqlalchemy.pool import StaticPool
 
+# In-memory SQLite for testing
+TEST_DATABASE_URL = "sqlite:///:memory:"
 
-@pytest.fixture
-def mock_db():
-    """Creates a mock SQLAlchemy session"""
-    mock_session = MagicMock()
-    return mock_session
+engine = create_engine(
+    TEST_DATABASE_URL,
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool
+)
+TestingSessionLocal = sessionmaker(bind=engine)
 
-
-@pytest.fixture
-def test_client(mock_db):
-    """Creates a test client for the FastAPI app with a mocked database session"""
-    app.dependency_overrides[get_db] = lambda: mock_db
-    client = TestClient(app)
-    yield client
-    app.dependency_overrides.clear()
+@pytest.fixture(scope="function")
+def db():
+    Base.metadata.create_all(bind=engine)
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=engine)
