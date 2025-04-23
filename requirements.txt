@@ -1,0 +1,12 @@
+pytest
+coverage
+pytest-cov
+fastapi[standard]
+requests
+python-dotenv
+uvicorn
+pydantic-settings
+sqlalchemy
+pymysql
+ruff
+pytest-asyncio
