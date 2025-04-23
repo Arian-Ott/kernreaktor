@@ -8,3 +8,6 @@ coverage
 .ruff_cache
 *.env
 
+.coverage
+
+htmlcov

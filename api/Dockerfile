@@ -19,8 +19,8 @@ FROM python:3.12-slim-bullseye
 
 COPY --from=builder /install /usr/local
 
-
 WORKDIR /api
-COPY . .
 
-ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "52345"]
+COPY . .
+WORKDIR /
+ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "52345"]
