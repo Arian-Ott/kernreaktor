@@ -1,0 +1,36 @@
+services: 
+  reaktor:
+    build: api 
+    container_name: reaktor-dev
+    ports:
+      - "52345:52345"
+    depends_on:
+      - maria
+  maria:
+    image: mariadb:latest
+    container_name: reaktor-maria
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: reaktor
+      MYSQL_USER: reaktor
+      MYSQL_PASSWORD: reaktor
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  pma:
+    image: phpmyadmin
+    container_name: reaktor-pma
+    environment:
+      PMA_HOST: reaktor-maria
+      PMA_USER: reaktor
+      PMA_PASSWORD: reaktor
+    ports:
+      - "8080:80"
+    depends_on:
+      - maria
+    
+
+volumes: 
+  mariadb_data:
