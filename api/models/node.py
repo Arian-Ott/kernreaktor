@@ -4,6 +4,7 @@ from datetime import datetime
 
 from api.db import Base
 
+
 class Node(Base):
     __tablename__ = "nodes"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
@@ -11,7 +12,10 @@ class Node(Base):
     cpus = Column(Integer, nullable=False)
     memory = Column(Integer, nullable=False)
     date_registered = Column(DateTime, nullable=False, default=datetime.now)
-    cluster_id = Column(Integer, ForeignKey("clusters.id"), nullable=True, ondelete="SET NULL", onupdate="CASCADE")
-    
-    
-    
+    cluster_id = Column(
+        Integer,
+        ForeignKey("clusters.id"),
+        nullable=True,
+        ondelete="SET NULL",
+        onupdate="CASCADE",
+    )

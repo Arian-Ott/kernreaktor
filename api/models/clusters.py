@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from datetime import datetime   
+from datetime import datetime
 from api.db import Base
+
 
 class Cluster(Base):
     __tablename__ = "clusters"
