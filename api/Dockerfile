@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /api
 COPY requirements.txt .
 RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
 
@@ -20,11 +20,11 @@ FROM python:3.12-slim-bullseye
 COPY --from=builder /install /usr/local
 
 
-WORKDIR /app
+WORKDIR /api
 COPY . .
 
 
-EXPOSE 52345
 
 
-ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "52345", "--reload", "--reload-dir", "/app"]
+
+ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "52345"]

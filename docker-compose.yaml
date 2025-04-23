@@ -1,11 +1,13 @@
 services: 
   reaktor:
-    build: api 
+    build: api/
     container_name: reaktor-dev
     ports:
       - "52345:52345"
     depends_on:
       - maria
+    env_file:
+      - .env
   maria:
     image: mariadb:latest
     container_name: reaktor-maria
@@ -18,6 +20,7 @@ services:
       - "3306:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
+    
 
   pma:
     image: phpmyadmin
