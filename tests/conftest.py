@@ -8,11 +8,10 @@ from sqlalchemy.pool import StaticPool
 TEST_DATABASE_URL = "sqlite:///:memory:"
 
 engine = create_engine(
-    TEST_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool
+    TEST_DATABASE_URL, connect_args={"check_same_thread": False}, poolclass=StaticPool
 )
 TestingSessionLocal = sessionmaker(bind=engine)
+
 
 @pytest.fixture(scope="function")
 def db():
