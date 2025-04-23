@@ -1,9 +1,7 @@
-# myapp/config.py
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # MariaDB Docker default env vars
     MYSQL_USER: str = "kernreaktor_experte"
     MYSQL_PASSWORD: str = "kernreaktor"
     MYSQL_ROOT_PASSWORD: str = "root"
@@ -11,7 +9,6 @@ class Settings(BaseSettings):
     DB_HOST: str = "127.0.0.2"
     DB_PORT: int = 3306
 
-    # App-specific
     DEBUG: bool = False
     API_PORT: int = 52345
 
@@ -28,5 +25,4 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
 
 
-# Instantiate once and import everywhere
 settings = Settings()
