@@ -31,3 +31,14 @@ Electrical power.
 Obviously, I can't run this server 24/7 with its 300W power consumption.
 
 I have to design a system which automatically spins up the HP server when needed.
+
+>[!TIP] Nice to know
+>The name `Kernreaktor` was inspired by the power of the server. Since the server has the power of a nuclear reactor comared to the MSI Cubi5, I named the project accordingly.
+
+## Architecture
+
+Kernreaktor is a Python FastAPI in a dockerised environment.
+
+## Features
+
+This section covers all features of the Kernreaktor. Planned features are **unticked** checkboxes, implemented are **ticked** checkboxes. For each feature there will be an opened issue.
