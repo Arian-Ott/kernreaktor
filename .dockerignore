@@ -5,3 +5,6 @@ __pycache__
 coverage
 **/*.md
 .DS_Store
+.ruff_cache
+*.env
+
