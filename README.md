@@ -1,6 +1,8 @@
 # Kernreaktor
 
-**Kernreaktor** _(nuclear reactor, pronounced as_ `[ˈkɛrnʁeˌʔaktoːɐ̯]` _or if you prefer English_ `[ˈkɜːn.riːˌæk.tɔː]`) is an open source project attempting to manage the load of Proxmox nodes. In every Proxmox homelab one encounters the challenge that there are many containers running with low resources but no intelligent coordination between them. These idle LXC containers or underutilized VMs consume baseline system capacity without contributing to meaningful workloads.
+![Kernreaktor Definition](docs/assets/definition.png)
+
+**Kernreaktor** (nuclear reactor) is an open source project attempting to manage the load of Proxmox nodes. In every Proxmox homelab one encounters the challenge that there are many containers running with low resources but no intelligent coordination between them. These idle LXC containers or underutilized VMs consume baseline system capacity without contributing to meaningful workloads.
 
 Kernreaktor tackles this by introducing centralised logic for dynamic resource management and load-aware orchestration. Its key use case is to monitor the current system state of all connected Proxmox nodes and:
 
