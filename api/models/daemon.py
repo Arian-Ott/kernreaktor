@@ -2,6 +2,7 @@ from api.db import Base
 from sqlalchemy import Column, Integer, String, DateTime, UUID, Boolean
 from uuid import uuid4
 from datetime import datetime
+
 class Daemon(Base):
     __tablename__ = "daemons"
 
