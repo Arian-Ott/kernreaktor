@@ -43,7 +43,7 @@ def update_user(user_id, username=None, password=None, is_active=None):
 
 
 def delete_user(user_id):
-    db = get_db()
+    db = next(get_db())
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         return None

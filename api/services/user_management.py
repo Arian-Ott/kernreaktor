@@ -4,6 +4,7 @@ from crud import users as crud_users
 from uuid import UUID
 from services.hash_utils import hash_password, verify_password
 
+#TODO: Add logging to the UserService class
 
 class UserService:
     def __init__(self):
