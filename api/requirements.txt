@@ -10,3 +10,4 @@ sqlalchemy
 pymysql
 ruff
 pytest-asyncio
+passlib[argon2]
