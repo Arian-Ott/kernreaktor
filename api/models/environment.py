@@ -95,3 +95,15 @@ class VMConfig(Base):
     boot_order = Column(String(32))
 
     environment = relationship("Environment", back_populates="vm_config")
+
+
+class IsoFile(Base):
+    __tablename__ = "iso_files"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(255), nullable=False)
+    path = Column(String(255), nullable=False)
+    size = Column(BigInteger, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    
