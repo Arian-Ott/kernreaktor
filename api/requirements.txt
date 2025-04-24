@@ -1,7 +1,7 @@
 pytest
 coverage
 pytest-cov
-fastapi[standard]
+fastapi[all]
 requests
 python-dotenv
 uvicorn
@@ -11,3 +11,4 @@ pymysql
 ruff
 pytest-asyncio
 passlib[argon2]
+python-jose[cryptography]

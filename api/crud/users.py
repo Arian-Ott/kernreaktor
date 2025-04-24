@@ -1,19 +1,19 @@
-from api.db import get_db
-from api.models.users import User
+from db import get_db
+from models.users import User
 
 
 def get_user(user_id):
-    db = get_db()
+    db = next(get_db())
     return db.query(User).filter(User.id == user_id).first()
 
 
 def get_user_by_username(username):
-    db = get_db()
+    db = next(get_db())
     return db.query(User).filter(User.username == username).first()
 
 
 def create_user(username, password):
-    db = get_db()
+    db = next(get_db())
     new_user = User(username=username, password=password)
     db.add(new_user)
     db.commit()
@@ -22,12 +22,12 @@ def create_user(username, password):
 
 
 def get_all_users():
-    db = get_db()
+    db = next(get_db())
     return db.query(User).all()
 
 
 def update_user(user_id, username=None, password=None, is_active=None):
-    db = get_db()
+    db = next(get_db())
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         return None

@@ -1,13 +1,15 @@
 from sqlalchemy.orm import Session
-from api.schemas.users import UserCreationSchema
-from api.crud import users as crud_users
+from schemas.users import UserCreationSchema
+from crud import users as crud_users
 from uuid import UUID
-from api.services.hash_utils import hash_password, verify_password
+from services.hash_utils import hash_password, verify_password
 
 
 class UserService:
     def __init__(self):
-        pass
+        if len(UserService.get_all_users()) == 0:
+            # Create a default admin user if no users exist
+            crud_users.create_user("admin", hash_password("admin"))
 
     @staticmethod
     def create_user(user: UserCreationSchema):
