@@ -1,46 +1,164 @@
-# Kernreaktor
+# Kernreaktor Worker
 
-![Kernreaktor Definition](docs/assets/definition.png)
+> [!IMPORTANT]
+> The Kernreaktor Worker is the local executable belonging to the Kernreaktor Repo. [github.com/Arian-Ott/kernreaktor](https://github.com/Arian-Ott/kernreaktor).
 
-**Kernreaktor** (nuclear reactor) is an open source project attempting to manage the load of Proxmox nodes. In every Proxmox homelab one encounters the challenge that there are many containers running with low resources but no intelligent coordination between them. These idle LXC containers or underutilized VMs consume baseline system capacity without contributing to meaningful workloads.
+## What is `Kernreaktor Worker`?
 
-Kernreaktor tackles this by introducing centralised logic for dynamic resource management and load-aware orchestration. Its key use case is to monitor the current system state of all connected Proxmox nodes and:
+The Kernreaktor Worker is a small compiled Python program which acts as a secure, local automation agent in a Proxmox-based cluster environment. It enables centralised orchestration and monitoring by communicating with both internal Proxmox APIs and external control services.
 
-- Limit resources (CPU shares, memory, disk I/O) of containers and VMs that show persistently low load, thereby freeing up system performance for other tasks.
+The Worker is intentionally designed to be:
 
-- Detect spikes or workload surges on any instance in real time and respond by automatically migrating the stressed VM or container to a node classified as high performance.
-
-- Apply different strategies based on administrator-defined criteria: e.g., memory pressure, I/O wait, CPU steal time, or queue lengths.
-
-This allows homelab admins to tune their cluster to react like an autonomous power grid — always adapting to where energy (in this case, compute power) is needed most.
-
-## Motivation
-
-With the beginning of my Business Informatics degree, I started building my own homelab. As of today it consists of one MSI Cubi5 with an Intel core i7 (12 CPU cores). It is obvious that having a proxmox setup with **one** node represented by a mini pc is not sufficient for high performance computing tasks. Hence, I bought a used **HPE ProLiant DL360 Gen9** for high performance tasks (e.g. CI/CD automations, intensive calculations and what not).
-
-This beast houses an insane 14-Core Intel Xenon with 2.4 GHz, 32 GB DDR4 RAM and 2x 300 GB HDD which are all cooled by 7 fans and powered by a 500 W power supply (though it uses only 300 W).
-
-For a homelab this setup is definetely overkill. Especially considering the jump from a "little" MSI Cubi5 to a full data centre graded high performance server.
-
-In the past I needed for some projects a high computational power to complete them. A prominent example was my first semester thesis about Retrieval Augmented Generation (RAG) where I built a complete data pipeline including a Vector Database, a Document DB and a massive load of text data (including excerpts of the German common law and the whole ring cycle of Wagner). Just processing and embedding the text files was painful, as the mini PC came at its limits.
-
-With the server I ordered solving those problems will be much easier in the future.
-
-**However there is one <u>_big_</u> limitation**
-
-Electrical power.
-
-Obviously, I can't run this server 24/7 with its 300W power consumption.
-
-I have to design a system which automatically spins up the HP server when needed.
-
->[!TIP] Nice to know
->The name `Kernreaktor` was inspired by the power of the server. Since the server has the power of a nuclear reactor comared to the MSI Cubi5, I named the project accordingly.
+- 🔐 **Security-focused** – never stores unencrypted secrets on disk
+- 📦 **Minimal** – no dependencies beyond a compiled executable and a config file
+- 🚀 **Portable** – runs on any Linux system without a Python runtime
 
 ## Architecture
 
-Kernreaktor is a Python FastAPI in a dockerised environment.
+During the development of [kernreaktor](https://github.com/Arian-Ott/kernreaktor) I quickly discorvered a major attack vector which has to me mitigated in early stages.
 
-## Features
+Any agent with the ability to monitor and control a Proxmox cluster must be treated as a high-value target and secured accordingly.
 
-This section covers all features of the Kernreaktor. Planned features are **unticked** checkboxes, implemented are **ticked** checkboxes. For each feature there will be an opened issue.
+This section explains the thought process behind this architecture.
+
+
+
+### Hypothetical Setup
+
+Imagine a typical Proxmox setup with three nodes:
+- Node A and Node B are always online.
+- Node C is normally powered off and only activated via Wake-on-LAN.
+
+A single node (e.g. Node A) runs the Kernreaktor Worker, which:
+- Periodically collects system load and health data from all nodes
+- Sends this data to the Kernreaktor API (hosted locally)
+- May later execute migration or scheduling tasks based on API responses
+
+### Local Network Setup
+
+The Kernreaktor API runs inside a Linux container (LXC) on the Proxmox cluster.
+For clarity, we refer to this LXC as the “Kernreaktor Container”.
+
+Importantly:
+
+- The Kernreaktor Container has no internet access
+- It is behind the DMZ, accessible only from within the trusted Proxmox LAN
+
+```txt
+[Internet]
+   │
+   ▼
+[Router] <---> [Proxmox Cluster]
+                     ├── Node A (Worker)
+                     ├── Node B
+                        └── Kernreaktor Container (LXC)
+                     └── Node C (offline, WoL)
+```
+
+
+Because the Kernreaktor API is isolated from the internet, it is:
+
+- Protected from external attacks
+- Not reachable via public interfaces
+- Considered part of the trusted internal infrastructure
+
+This makes it a trusted backend service, safe from typical web-facing API vulnerabilities, and suitable for receiving direct control signals from the internal Worker process.
+
+### Scenario: Kernreaktor API Hosted Externally
+
+In this setup, the **Kernreaktor API** is hosted on a **remote server accessible via the internet**, instead of being located within the Proxmox cluster. This enables cloud-based orchestration and monitoring — but it also introduces a critical security concern:
+>[!CAUTION]
+>**If an attacker can intercept or forge communication with the API, they could gain control over the entire Proxmox cluster.**
+>
+>At this stage attackers can comporomise **in the worst case** the entire home network including all proxmox services which can be a risk when work devices share the same network.
+
+---
+
+#### Security Challenge
+
+**Why is this dangerous?**
+
+Because the API has the authority to:
+
+- Trigger VM or LXC migrations
+- Power on/off Proxmox nodes
+- Influence the internal load-balancing and scheduling logic
+
+A breach in API security could result in:
+
+- Unauthorised infrastructure control
+- Downtime or denial of service
+- Potential data exposure or loss
+- Compromise of internal networks (which can be used by adversaries for designing new attacks)
+
+#### Mitigation Strategy
+
+To address this, a multi-layered **zero-trust** security model is implemented:
+
+##### 1. Outbound-Only Communication
+
+- The **Worker always initiates the connection**
+- The API **never pushes commands** to the Worker
+- No incoming ports need to be open on Proxmox nodes
+- Prevents exposure of internal services to the public
+
+##### 2. Elliptic Curve Encryption (ECIES)
+
+- Sensitive payloads are encrypted at the application level before transit
+- Uses **Curve25519** or equivalent
+- The API’s public key is pre-shared with each Worker
+- The Worker encrypts each message using **ECIES** before transmission
+
+##### 3. Unique Keypair Per Worker
+
+- Every Worker has its own **private/public keypair**
+- Keys are stored only on the Worker node
+- API uses public keys to verify authenticity
+- Prevents impersonation and MITM attacks
+
+##### 4. Data Anonymisation
+
+- Information is anonymised before being stored in the API database
+- Hostnames, IP addresses, and node identifiers are hashed or pseudonymised
+- Makes the database useless to attackers even if breached
+
+#####  5. JWT Authentication with Expiry
+
+- Workers authenticate using **JWTs**
+- Tokens are:
+  - Signed using `HS512` or `ES256`
+  - Short-lived (e.g., valid for 5–10 minutes)
+- Ensures stateless, time-bound access control
+
+##### 6. Redis-Based Session Control
+
+- Session and token validation is managed using **Redis**
+- Tokens and challenge responses are stored with short TTLs
+- Prevents reuse of expired or intercepted credentials
+
+##### 7. Rate Limiting and Abuse Detection
+
+- API requests are rate-limited per Worker
+- Repeated invalid attempts result in:
+- Protects against brute-force and denial-of-service attacks
+
+
+### Why so much work?
+
+Adversaries may have a huge interest in infiltrating the Kernreaktor API since it manages an entire Proxmox cluster. In a home lab scenario this is **partially** neglectable, as there are not mission critical systems running. 
+
+## 💡 Note on VMWare to Proxmox Migration Trends
+
+In recent times, with changes to VMware’s licensing model, more and more users across various online forums and communities have reported migrating entire server infrastructures from VMware to Proxmox.
+
+While I cannot personally verify the full extent or impact of VMware’s licensing changes, nor do I claim that one hypervisor is inherently better than another, I found the following resources relevant and informative:
+
+- 📄 [QLOS Blog: Changes in VMware Licensing – Is it Time to Migrate to Proxmox?](https://qlos.com/en/changes-in-vmware-licensing-is-it-time-to-migrate-to-proxmox)
+- 🧵 [Reddit Sysadmin Discussion – Migrating from VMware to Proxmox](https://www.reddit.com/r/sysadmin/comments/1j3lbgj/to_those_who_successfully_migrated_vmware_to/?utm_source=chatgpt.com&rdt=56706)
+- 📰 [CIO.com: VMware Licensing and Pricing Hikes – What Options Do You Have?](https://www.cio.com/article/2513389/vmware-licensing-and-pricing-hikes-what-options-do-you-have.html)
+
+---
+
+> _This project started as a personal homelab experiment. It's not intended as a universal solution or an endorsement of any specific platform. My focus is on creating a lightweight, secure setup that allows me to sleep well at night — knowing that basic infrastructure security has been thoughtfully addressed._
+
+---
