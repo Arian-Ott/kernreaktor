@@ -3,6 +3,7 @@ from sqlalchemy import Column, Integer, String, DateTime, UUID, Boolean
 from uuid import uuid4
 from datetime import datetime
 
+
 class Daemon(Base):
     __tablename__ = "daemons"
 
@@ -10,8 +11,7 @@ class Daemon(Base):
     client_name = Column(String(32), nullable=False, unique=True)
     client_secret = Column(String(64), nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
-    updated_at = Column(DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
+    updated_at = Column(
+        DateTime, nullable=False, default=datetime.now, onupdate=datetime.now
+    )
     is_active = Column(Boolean, default=True)
-    
-
-

@@ -106,4 +106,3 @@ class IsoFile(Base):
     size = Column(BigInteger, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-    
