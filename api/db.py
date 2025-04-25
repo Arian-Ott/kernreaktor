@@ -2,9 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from config import settings
 
-
+print(settings.sqlalchemy_database_url)
 engine = create_engine(
-    settings.sqlalchemy_database_url,
+    url="mysql+pymysql://reaktor:reaktor@127.0.0.1:3306/reaktor",
     pool_pre_ping=True,
 )
 

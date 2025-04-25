@@ -6,7 +6,7 @@ from db import Base, engine
 from routes.oauth_routes import router as oauth_router
 from routes.user_routes import user_router
 
-app = FastAPI(debug=settings.DEBUG)
+app = FastAPI(debug=settings.DEBUG, openapi_prefix="/api/v1")
 
 app.include_router(oauth_router)
 app.include_router(user_router)

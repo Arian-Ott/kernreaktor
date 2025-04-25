@@ -5,6 +5,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Optional
 from services.user_management import UserService
+from config import settings
 
 router = APIRouter(prefix="/oauth", tags=["OAuth2"])
 
@@ -12,7 +13,7 @@ router = APIRouter(prefix="/oauth", tags=["OAuth2"])
 
 
 # Security and token setup
-SECRET_KEY = "very_secret_key"
+SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS512"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -59,5 +60,19 @@ async def protected_route(token: str = Depends(oauth2_scheme)):
         if username is None:
             raise HTTPException(status_code=401, detail="Invalid token")
         return {"message": f"Hello, {username}"}
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+
+@router.get("/me")
+async def get_me(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        user = UserService.get_user(user_id=user_id)
+        del user.password
+        return user
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")

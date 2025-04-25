@@ -11,5 +11,3 @@ class User(Base):
     password = Column(String(128), nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
     is_active = Column(Boolean, default=True)
-
-

@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     MYSQL_DATABASE: str = "reaktor"
     DB_HOST: str = "127.0.0.1"
     DB_PORT: int = 3306
-
+    SECRET_KEY: str = "your_secret_key"
     DEBUG: bool = False
     API_PORT: int = 52345
 

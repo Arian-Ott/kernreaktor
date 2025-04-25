@@ -1,3 +1,2 @@
-
-#TODO:  Add user log
-#TODO: Add application log
+# TODO:  Add user log
+# TODO: Add application log
