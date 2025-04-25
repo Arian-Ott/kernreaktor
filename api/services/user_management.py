@@ -25,10 +25,11 @@ class UserService:
         return crud_users.create_user(user.username, user.password)
 
     @staticmethod
-    def get_user(user_id: UUID | None = None, username: str | None = None):
+    def get_user(user_id=None, username: str | None = None):
         """
         Get a user by ID or username.
         """
+
         if user_id:
             return crud_users.get_user(user_id)
         elif username:
@@ -44,11 +45,12 @@ class UserService:
         return crud_users.get_all_users()
 
     @staticmethod
-    def delete_user(user_id: UUID | None = None, username: str | None = None):
+    def delete_user(user_id=None, username: str | None = None):
         """
         Delete a user by ID.
         """
         if user_id:
+            user_id = UUID(user_id)
             user = UserService.get_user(user_id=user_id)
         elif username:
             user = UserService.get_user(username=username)
@@ -60,7 +62,7 @@ class UserService:
 
     @staticmethod
     def update_user(
-        user_id: UUID | None = None,
+        user_id=None,
         username: str | None = None,
         password: str | None = None,
         is_active: bool | None = None,
@@ -69,6 +71,7 @@ class UserService:
         Update a user by ID.
         """
         if user_id:
+            user_id = UUID(user_id)
             user = UserService.get_user(user_id=user_id)
         elif username:
             user = UserService.get_user(username=username)
@@ -83,10 +86,14 @@ class UserService:
         )
 
     @staticmethod
-    def verify_password(user_id: UUID, password: str):
+    def verify_password(user_id, password: str):
         """
         Verify a user's password.
         """
+        if user_id:
+            user = UserService.get_user(user_id=user_id)
+        else:
+            raise ValueError("user_id must be provided")
         user = UserService.get_user(user_id=user_id)
         if not user:
             raise ValueError("User not found")

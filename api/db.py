@@ -8,7 +8,7 @@ from sqlalchemy.exc import OperationalError
 @retry(stop=stop_after_attempt(10), wait=wait_fixed(2))
 def get_engine():
     engine = create_engine(settings.sqlalchemy_database_url, pool_pre_ping=True)
-    # Testverbindung
+
     with engine.connect() as connection:
         connection.execute(text("SELECT 1"))
     return engine

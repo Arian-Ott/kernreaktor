@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from services.user_management import UserService
 from config import settings
+from uuid import UUID
 
 router = APIRouter(prefix="/oauth", tags=["OAuth2"])
 
@@ -25,7 +26,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         if "role" and "user_id" in payload:
-            if UserService.get_user(user_id=payload.get("sub")) is None:
+            if UserService.get_user(user_id=UUID(payload.get("sub"))) is None:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="User not found",
@@ -50,6 +51,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 @router.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = UserService.get_user(username=form_data.username)
+    print(user.id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -89,7 +91,7 @@ async def get_me(token: str = Depends(oauth2_scheme)):
         user_id: str = payload.get("sub")
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
-        user = UserService.get_user(user_id=user_id)
+        user = UserService.get_user(user_id=UUID(user_id))
         del user.password
         return user
     except JWTError:
