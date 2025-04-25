@@ -1,7 +1,7 @@
 services: 
   reaktor:
     build: api/
-    container_name: reaktor-dev
+    container_name: reaktor
     ports:
       - "52345:52345"
     depends_on:
@@ -27,7 +27,7 @@ services:
       - reaktor-net
 
   pma:
-    image: phpmyadmin:latest
+    image: phpmyadmin:fpm-alpine
     container_name: reaktor-pma
     environment:
       PMA_HOST: maria

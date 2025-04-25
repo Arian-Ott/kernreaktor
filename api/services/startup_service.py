@@ -3,6 +3,7 @@ from models.users import User, UserRoles
 from schemas.roles import RoleBaseSchema
 from services.hash_utils import hash_password
 from db import get_db
+import logging
 
 
 def create_roles():
@@ -13,8 +14,12 @@ def create_roles():
         {"name": "technical", "description": "technical user"},
     ]
     for role in roles:
-        lo_role = RoleBaseSchema(**role)
-        create_role(lo_role)
+        try:
+            lo_role = RoleBaseSchema(**role)
+            create_role(lo_role)
+        except Exception as e:
+            logging.error(f"Error creating role {role['name']}: {e}")
+            continue
 
 
 def create_admin_user():
@@ -22,14 +27,20 @@ def create_admin_user():
     # Check if the admin user already exists
     existing_user = db.query(User).filter(User.username == "admin").first()
     if not existing_user:
-        new_user = User(username="admin", password=hash_password("changememf"))
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
-        new_user_role = UserRoles(user_id=new_user.id, role_name="admin")
-        db.add(new_user_role)
-        db.commit()
-        db.refresh(new_user_role)
+        try:
+            new_user = User(username="admin", password=hash_password("changememf"))
+            db.add(new_user)
+            db.commit()
+            db.refresh(new_user)
+        except Exception as e:
+            logging.error(f"Error creating admin user: {e}")
+        try:
+            new_user_role = UserRoles(user_id=new_user.id, role_name="admin")
+            db.add(new_user_role)
+            db.commit()
+            db.refresh(new_user_role)
+        except Exception as e:
+            logging.error(f"Error assigning admin role to user: {e}")
 
 
 def startup_tasks():
