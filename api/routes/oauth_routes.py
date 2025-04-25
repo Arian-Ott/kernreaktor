@@ -51,7 +51,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 @router.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = UserService.get_user(username=form_data.username)
-    print(user.id)
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
