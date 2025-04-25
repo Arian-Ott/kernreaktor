@@ -1,0 +1,22 @@
+Kernreaktor – Load-aware orchestration daemon for container workloads in Proxmox environments  
+
+Copyright © 2025 Arian Ott
+
+Licensed under the Apache License, Version 2.0 (the "Licence"); you may not use this file except in compliance with the Licence.  
+You may obtain a copy of the Licence at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the Licence is distributed on an  
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+See the Licence for the specific language governing permissions and limitations under the Licence.
+
+---
+
+This project, Kernreaktor, is a labour of passion built to make Proxmox homelab environments more intelligent and efficient.  
+It is developed and maintained by Arian Ott (https://github.com/Arian-Ott).
+
+I would kindly ask that any use, redistribution, or adaptation of Kernreaktor credits the original project and its contributors.  
+This NOTICE file must be preserved in all distributions that include significant portions of this software.
+
+Thank you for supporting open source and for helping this project grow.
