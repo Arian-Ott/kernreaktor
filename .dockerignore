@@ -1,7 +1,7 @@
 .venv
 tests
 .gitignore
-__pycache__
+**/__pycache__
 coverage
 **/*.md
 .DS_Store

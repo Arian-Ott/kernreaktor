@@ -8,6 +8,9 @@ services:
       - maria
     env_file:
       - .env
+    networks:
+      - reaktor-net
+
   maria:
     image: mariadb:latest
     container_name: reaktor-maria
@@ -20,20 +23,26 @@ services:
       - "3306:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
-    
+    networks:
+      - reaktor-net
 
   pma:
-    image: phpmyadmin
+    image: phpmyadmin:latest
     container_name: reaktor-pma
     environment:
-      PMA_HOST: reaktor-maria
+      PMA_HOST: maria
       PMA_USER: reaktor
       PMA_PASSWORD: reaktor
     ports:
       - "8080:80"
     depends_on:
       - maria
-    
+    networks:
+      - reaktor-net
 
 volumes: 
   mariadb_data:
+
+networks:
+  reaktor-net:
+    driver: bridge
