@@ -40,6 +40,16 @@ services:
     networks:
       - reaktor-net
 
+  mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: reaktor-mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    networks:
+      - reaktor-net
+    
+
 volumes: 
   mariadb_data:
 
