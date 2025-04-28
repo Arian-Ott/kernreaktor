@@ -4,8 +4,11 @@ services:
     container_name: reaktor
     ports:
       - "52345:52345"
+      
     depends_on:
       - maria
+      - mqtt
+    
     env_file:
       - .env
     networks:
@@ -27,7 +30,7 @@ services:
       - reaktor-net
 
   pma:
-    image: phpmyadmin:fpm-alpine
+    image: phpmyadmin
     container_name: reaktor-pma
     environment:
       PMA_HOST: maria
@@ -39,6 +42,20 @@ services:
       - maria
     networks:
       - reaktor-net
+
+  mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: reaktor-mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - reaktor-net
+    
 
 volumes: 
   mariadb_data:

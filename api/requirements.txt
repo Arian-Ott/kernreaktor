@@ -8,3 +8,5 @@ pymysql
 passlib[argon2]
 python-jose[cryptography]
 tenacity
+paho-mqtt
+aiomqtt
