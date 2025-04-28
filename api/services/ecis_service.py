@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 import os
+from base64 import urlsafe_b64decode, urlsafe_b64encode
 from config import settings
 
 
@@ -80,10 +81,10 @@ def ecies_encrypt(plaintext: bytes) -> dict:
     )
 
     return {
-        "ephemeral_public_key": ephemeral_public_bytes,
-        "iv": iv,
-        "ciphertext": ciphertext,
-        "tag": encryptor.tag
+        "ephemeral_public_key": urlsafe_b64encode(ephemeral_public_bytes).decode(),
+        "iv": urlsafe_b64encode(iv).decode(),
+        "ciphertext": urlsafe_b64encode(ciphertext).decode(),
+        "tag": urlsafe_b64encode(encryptor.tag).decode()
     }
 
 
