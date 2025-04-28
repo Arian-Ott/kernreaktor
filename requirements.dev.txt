@@ -2,14 +2,16 @@ pytest
 coverage
 pytest-cov
 fastapi[all]
+ruff
 requests
 python-dotenv
 uvicorn
 pydantic-settings
 sqlalchemy
 pymysql
-ruff
 pytest-asyncio
 passlib[argon2]
 python-jose[cryptography]
 tenacity
+paho-mqtt
+asyncio-mqtt
