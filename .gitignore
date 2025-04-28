@@ -11,3 +11,5 @@ venv
 
 api/keys/public.pem
 api/keys/private.key
+mosquitto/log
+mosquitto/data

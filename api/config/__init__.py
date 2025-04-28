@@ -24,7 +24,7 @@ class Settings(BaseSettings):
         """Build the SQLAlchemy-compatible database URL from env vars"""
         if not self.DEBUG and self.DOCKER:
             self.DB_HOST = "maria"
-            self.MQTT_BROKER = "mqtt"
+            self.MQTT_BROKER = "reaktor-mqtt"
             
             
         return (
