@@ -1,28 +1,24 @@
-from api.models.daemon import Daemon, EncryptionKeypairs
-from api.db import get_db
-
+from models.daemon import Daemon, EncryptionKeypairs
+from db import get_db
 
 def get_daemon(daemon_id):
-    db = get_db()
+    db = next(get_db())
     return db.query(Daemon).filter(Daemon.id == daemon_id).first()
 
-
 def get_daemon_by_client_name(client_name):
-    db = get_db()
+    db = next(get_db())
     return db.query(Daemon).filter(Daemon.client_name == client_name).first()
 
-
 def create_daemon(client_name, client_secret):
-    db = get_db()
+    db = next(get_db())
     new_daemon = Daemon(client_name=client_name, client_secret=client_secret)
     db.add(new_daemon)
     db.commit()
     db.refresh(new_daemon)
     return new_daemon
 
-
 def update_daemon(daemon_id, client_name=None, client_secret=None, is_active=None):
-    db = get_db()
+    db = next(get_db())
     daemon = db.query(Daemon).filter(Daemon.id == daemon_id).first()
     if not daemon:
         return None
@@ -36,9 +32,8 @@ def update_daemon(daemon_id, client_name=None, client_secret=None, is_active=Non
     db.refresh(daemon)
     return daemon
 
-
 def delete_daemon(daemon_id):
-    db = get_db()
+    db = next(get_db())
     daemon = db.query(Daemon).filter(Daemon.id == daemon_id).first()
     if not daemon:
         return None
@@ -46,13 +41,12 @@ def delete_daemon(daemon_id):
     db.commit()
     return daemon
 
-
 def get_all_daemons():
-    db = get_db()
+    db = next(get_db())
     return db.query(Daemon).all()
 
 def add_encryption_keypair(daemon_id, public_key, private_key):
-    db = get_db()
+    db = next(get_db())
     new_keypair = EncryptionKeypairs(
         public_key=public_key,
         private_key=private_key,
@@ -64,7 +58,7 @@ def add_encryption_keypair(daemon_id, public_key, private_key):
     return new_keypair
 
 def delete_encryption_keypair(keypair_id):
-    db = get_db()
+    db = next(get_db())
     keypair = db.query(EncryptionKeypairs).filter(EncryptionKeypairs.id == keypair_id).first()
     if not keypair:
         return None
@@ -73,7 +67,7 @@ def delete_encryption_keypair(keypair_id):
     return keypair
 
 def get_encryption_keypair(keypair_id: None | str = None, daemon_id: None | str = None):
-    db = get_db()
+    db = next(get_db())
     if keypair_id:
         return db.query(EncryptionKeypairs).filter(EncryptionKeypairs.id == keypair_id).first()
     elif daemon_id:
@@ -82,5 +76,5 @@ def get_encryption_keypair(keypair_id: None | str = None, daemon_id: None | str 
         raise ValueError("Either keypair_id or daemon_id must be provided")
     
 def get_daemon_by_name(client_name: str):
-    db = get_db()
+    db = next(get_db())
     return db.query(Daemon).filter(Daemon.client_name == client_name).first()

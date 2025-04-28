@@ -1,5 +1,6 @@
 from hashlib import sha3_512
-from api.crud.daemons import (
+from base64 import urlsafe_b64encode, urlsafe_b64decode
+from crud.daemons import (
     get_daemon,
     get_daemon_by_client_name,
     create_daemon,
@@ -9,7 +10,7 @@ from api.crud.daemons import (
     add_encryption_keypair,
     get_daemon_by_name,
 )
-from api.services.ecis_service import ecies_encrypt
+from services.ecis_service import ecies_encrypt
 
 def add_daemon(client_name, client_secret):
     """
@@ -78,6 +79,31 @@ class DaemonService:
             self.daemon_id,
             public_key=encrypted_public_key,
             private_key=encrypted_private_key,
+        )
+    def add_encrypted_keypair(self, encrypted_data):
+        """
+        Add an encrypted keypair for the daemon.
+        """
+        
+        private_key = encrypted_data["private_key"]
+        public_key = encrypted_data["public_key"]
+        private_key = urlsafe_b64decode(private_key).decode() 
+        public_key = urlsafe_b64decode(public_key).decode()
+        encrypted_data = {
+            "private_key": private_key,
+            "public_key": public_key
+        }
+        public_key = ecies_encrypt(encrypted_data["public_key"].encode())
+        private_key = ecies_encrypt(encrypted_data["private_key"].encode())
+        encrypted_data = {
+            "private_key": private_key,
+            "public_key": public_key
+        }
+        
+        add_encryption_keypair(
+            self.daemon_id,
+            public_key=encrypted_data["public_key"],
+            private_key=encrypted_data["private_key"],
         )
             
         

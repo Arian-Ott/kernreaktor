@@ -1,4 +1,4 @@
-from crud.roles import create_role
+from crud.roles import create_role, get_role
 from models.users import User, UserRoles
 from schemas.roles import RoleBaseSchema
 from services.hash_utils import hash_password
@@ -16,9 +16,13 @@ def create_roles():
         {"name": "technical", "description": "technical user"},
     ]
     for role in roles:
+        if get_role(role["name"]):
+            continue
         try:
             lo_role = RoleBaseSchema(**role)
+           
             create_role(lo_role)
+            
         except Exception as e:
             logging.error(f"Error creating role {role['name']}: {e}")
             continue

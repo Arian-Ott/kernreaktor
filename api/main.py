@@ -9,6 +9,7 @@ from routes.user_routes import user_router
 from services.startup_service import startup_tasks
 from services.mqtt_service import mqtt_listener
 from routes.ecis_routes import ecis_router
+from routes.daemon_routes import daemon_router
 app = FastAPI(
     debug=settings.DEBUG,
     root_path="/api/v0"
@@ -18,6 +19,7 @@ app = FastAPI(
 app.include_router(oauth_router)
 app.include_router(user_router)
 app.include_router(ecis_router)
+app.include_router(daemon_router)
 # Startup Routine
 async def on_startup():
     if settings.DEBUG:

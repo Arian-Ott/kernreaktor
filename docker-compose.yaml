@@ -27,7 +27,7 @@ services:
       - reaktor-net
 
   pma:
-    image: phpmyadmin:fpm-alpine
+    image: phpmyadmin
     container_name: reaktor-pma
     environment:
       PMA_HOST: maria
