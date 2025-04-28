@@ -11,9 +11,10 @@ async def mqtt_listener():
             # password=settings.MQTT_API_PASSWORD,
             keepalive=60
         ) as client:
-            await client.subscribe("#")
-
-            await client.publish("status", b"kernreaktor-on")
+            await client.subscribe("kernreaktor/worker/#")
+            await client.subscribe("kernreaktor/status/#")
+            
+            await client.publish("kernreaktor/status", b"kernreaktor-on")
 
             async for message in client.messages:  
                 print(f"Empfangen: Thema={message.topic}, Nachricht={message.payload.decode()}")
