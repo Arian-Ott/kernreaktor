@@ -1,4 +1,4 @@
-from api.models.daemon import Daemon
+from api.models.daemon import Daemon, EncryptionKeypairs
 from api.db import get_db
 
 
@@ -50,3 +50,37 @@ def delete_daemon(daemon_id):
 def get_all_daemons():
     db = get_db()
     return db.query(Daemon).all()
+
+def add_encryption_keypair(daemon_id, public_key, private_key):
+    db = get_db()
+    new_keypair = EncryptionKeypairs(
+        public_key=public_key,
+        private_key=private_key,
+        daemon_id=daemon_id
+    )
+    db.add(new_keypair)
+    db.commit()
+    db.refresh(new_keypair)
+    return new_keypair
+
+def delete_encryption_keypair(keypair_id):
+    db = get_db()
+    keypair = db.query(EncryptionKeypairs).filter(EncryptionKeypairs.id == keypair_id).first()
+    if not keypair:
+        return None
+    db.delete(keypair)
+    db.commit()
+    return keypair
+
+def get_encryption_keypair(keypair_id: None | str = None, daemon_id: None | str = None):
+    db = get_db()
+    if keypair_id:
+        return db.query(EncryptionKeypairs).filter(EncryptionKeypairs.id == keypair_id).first()
+    elif daemon_id:
+        return db.query(EncryptionKeypairs).filter(EncryptionKeypairs.daemon_id == daemon_id).first()
+    else:
+        raise ValueError("Either keypair_id or daemon_id must be provided")
+    
+def get_daemon_by_name(client_name: str):
+    db = get_db()
+    return db.query(Daemon).filter(Daemon.client_name == client_name).first()

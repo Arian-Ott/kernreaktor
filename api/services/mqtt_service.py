@@ -1,23 +1,22 @@
 from config import settings
 import asyncio
-import asyncio_mqtt
+import aiomqtt
 
 async def mqtt_listener():
     try:
-        async with asyncio_mqtt.Client(
+        async with aiomqtt.Client(
             hostname=settings.MQTT_BROKER,
             port=settings.MQTT_PORT,
-            #username=settings.MQTT_API_USER,
-            #password=settings.MQTT_API_PASSWORD,
+            # username=settings.MQTT_API_USER,
+            # password=settings.MQTT_API_PASSWORD,
             keepalive=60
         ) as client:
-            async with client.filtered_messages("#") as messages:
-                await client.subscribe("#")
+            await client.subscribe("#")
 
-                
-                await client.publish("status", "kernreaktor-on")
+            await client.publish("status", b"kernreaktor-on")
 
-                async for message in messages:
-                    print(f"Empfangen: Thema={message.topic}, Nachricht={message.payload.decode()}")
+            async for message in client.messages:  
+                print(f"Empfangen: Thema={message.topic}, Nachricht={message.payload.decode()}")
+
     except Exception as e:
         print(f"[MQTT-Listener Fehler] {e}")

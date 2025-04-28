@@ -8,3 +8,6 @@ coverage
 htmlcov
 .pytest_cache
 venv
+
+api/keys/public.pem
+api/keys/private.key
