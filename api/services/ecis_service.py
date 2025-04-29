@@ -9,7 +9,9 @@ from base64 import urlsafe_b64decode, urlsafe_b64encode
 from config import settings
 
 
-def generate_ec_key_pair() -> tuple[ec.EllipticCurvePrivateKey, ec.EllipticCurvePublicKey]:
+def generate_ec_key_pair() -> tuple[
+    ec.EllipticCurvePrivateKey, ec.EllipticCurvePublicKey
+]:
     """
     Generates a new ECC key pair (SECP256R1),
     saves them to 'keys/private.key' and 'keys/public.pem',
@@ -18,7 +20,6 @@ def generate_ec_key_pair() -> tuple[ec.EllipticCurvePrivateKey, ec.EllipticCurve
     private_key = ec.generate_private_key(ec.SECP256R1())
     public_key = private_key.public_key()
 
-    
     return private_key, public_key
 
 
@@ -28,9 +29,7 @@ def load_private_key() -> ec.EllipticCurvePrivateKey:
     """
     with open("keys/private.key", "rb") as f:
         private_key = serialization.load_pem_private_key(
-            f.read(),
-            password=None,
-            backend=default_backend()
+            f.read(), password=None, backend=default_backend()
         )
     return private_key
 
@@ -41,8 +40,7 @@ def load_public_key() -> ec.EllipticCurvePublicKey:
     """
     with open("keys/public.pem", "rb") as f:
         public_key = serialization.load_pem_public_key(
-            f.read(),
-            backend=default_backend()
+            f.read(), backend=default_backend()
         )
     return public_key
 
@@ -52,7 +50,7 @@ def derive_aes_key(shared_key: bytes) -> bytes:
         algorithm=hashes.SHA256(),
         length=32,
         salt="".encode(),
-        info=b'ecies-encryption',
+        info=b"ecies-encryption",
     ).derive(shared_key)
 
 
@@ -69,22 +67,19 @@ def ecies_encrypt(plaintext: bytes) -> dict:
     aes_key = derive_aes_key(shared_key)
 
     iv = os.urandom(12)
-    encryptor = Cipher(
-        algorithms.AES(aes_key),
-        modes.GCM(iv)
-    ).encryptor()
+    encryptor = Cipher(algorithms.AES(aes_key), modes.GCM(iv)).encryptor()
     ciphertext = encryptor.update(plaintext) + encryptor.finalize()
 
     ephemeral_public_bytes = ephemeral_public_key.public_bytes(
         encoding=serialization.Encoding.X962,
-        format=serialization.PublicFormat.UncompressedPoint
+        format=serialization.PublicFormat.UncompressedPoint,
     )
 
     return {
         "ephemeral_public_key": urlsafe_b64encode(ephemeral_public_bytes).decode(),
         "iv": urlsafe_b64encode(iv).decode(),
         "ciphertext": urlsafe_b64encode(ciphertext).decode(),
-        "tag": urlsafe_b64encode(encryptor.tag).decode()
+        "tag": urlsafe_b64encode(encryptor.tag).decode(),
     }
 
 
@@ -95,16 +90,14 @@ def ecies_decrypt(data: dict) -> bytes:
     recipient_private_key = load_private_key()
 
     ephemeral_public_key = ec.EllipticCurvePublicKey.from_encoded_point(
-        ec.SECP256R1(),
-        data["ephemeral_public_key"]
+        ec.SECP256R1(), data["ephemeral_public_key"]
     )
 
     shared_key = recipient_private_key.exchange(ec.ECDH(), ephemeral_public_key)
     aes_key = derive_aes_key(shared_key)
 
     decryptor = Cipher(
-        algorithms.AES(aes_key),
-        modes.GCM(data["iv"], data["tag"])
+        algorithms.AES(aes_key), modes.GCM(data["iv"], data["tag"])
     ).decryptor()
     plaintext = decryptor.update(data["ciphertext"]) + decryptor.finalize()
 
