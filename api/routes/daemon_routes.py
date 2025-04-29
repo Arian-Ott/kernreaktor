@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from routes.oauth_routes import oauth2_scheme, get_current_user
-from services.daemon_service import DaemonService, create_daemon
+from api.routes.oauth_routes import oauth2_scheme, get_current_user
+from api.services.daemon_service import DaemonService, create_daemon
 from uuid import UUID
 daemon_router = APIRouter(prefix="/daemon", tags=["Daemon"])
 

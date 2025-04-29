@@ -5,7 +5,7 @@ from datetime import datetime
 from fastapi.responses import JSONResponse 
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
-from schemas.ecis import EcisPublicKey
+from api.schemas.ecis import EcisPublicKey
 ecis_router = APIRouter(prefix="/ecis", tags=["ECIS"])
 
 @ecis_router.get("/public_key")
