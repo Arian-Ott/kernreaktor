@@ -1,6 +1,6 @@
 from hashlib import sha3_512
 from base64 import urlsafe_b64encode, urlsafe_b64decode
-from crud.daemons import (
+from api.crud.daemons import (
     get_daemon,
     get_daemon_by_client_name,
     create_daemon,
@@ -10,7 +10,7 @@ from crud.daemons import (
     add_encryption_keypair,
     get_daemon_by_name,
 )
-from services.ecis_service import ecies_encrypt
+from api.services.crypto_service import *
 
 def add_daemon(client_name, client_secret):
     """
