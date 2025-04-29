@@ -29,7 +29,7 @@ async def mqtt_listener():
             async for message in client.messages:
                 
                 decrypted_message = decrypt_mqtt_request(message.payload)
-                
+                print(decrypted_message)
     except Exception as e:
         logging.error(f"[MQTT-Listener Fehler] {e}")  
         
