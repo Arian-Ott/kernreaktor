@@ -1,9 +1,9 @@
-from crud.roles import create_role, get_role
-from models.users import User, UserRoles
-from schemas.roles import RoleBaseSchema
-from services.hash_utils import hash_password
-from db import get_db
-from services.ecis_service import *
+from api.crud.roles import create_role, get_role
+from api.models.users import User, UserRoles
+from api.schemas.roles import RoleBaseSchema
+from api.services.hash_utils import hash_password
+from api.db import get_db
+from api.services.ecis_service import *
 import logging
 import os
 

@@ -43,6 +43,11 @@ class Settings(BaseSettings):
     MQTT_PORT: int = 1883
     MQTT_API_USER: str | None = None
     MQTT_API_PASSWORD: str | None = None
+    INFLUX_HOST: str = "127.0.0.1"
+    INFLUX_PORT: int = 8086
+    INFLUX_TOKEN: str = "your_influx_token"
+    INFLUX_ORG: str = "com.kernreaktor"
+    INFLUX_BUCKET: str = "reaktor"
 
     @property
     def sqlalchemy_database_url(self) -> str:

@@ -4,8 +4,8 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Optional
-from services.user_management import UserService
-from config import settings
+from api.services.user_management import UserService
+from api.config import settings
 from uuid import UUID
 
 router = APIRouter(prefix="/oauth", tags=["OAuth2"])

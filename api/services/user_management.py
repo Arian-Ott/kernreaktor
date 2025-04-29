@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from schemas.users import UserCreationSchema
-from crud import users as crud_users
+from api.schemas.users import UserCreationSchema
+from api.crud import users as crud_users
 from uuid import UUID
-from services.hash_utils import hash_password, verify_password
+from api.services.hash_utils import hash_password, verify_password
 
 # TODO: Add logging to the UserService class
 

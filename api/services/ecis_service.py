@@ -6,7 +6,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 import os
 from base64 import urlsafe_b64decode, urlsafe_b64encode
-from config import settings
+from api.config import settings
 
 
 def generate_ec_key_pair() -> tuple[

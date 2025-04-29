@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
-from config import settings
+from api.config import settings
 from tenacity import retry, stop_after_attempt, wait_fixed
 from sqlalchemy.exc import OperationalError
 

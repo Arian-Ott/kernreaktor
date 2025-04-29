@@ -2,6 +2,7 @@ from config import settings
 import asyncio
 import base64
 import logging
+from api.services import message_handler
 from base64 import urlsafe_b64encode, urlsafe_b64decode
 import aiomqtt
 from services.ecis_service import ecies_decrypt, ecies_encrypt
@@ -29,7 +30,7 @@ async def mqtt_listener():
             await client.publish("kernreaktor/worker/", enc)
             async for message in client.messages:
                 decrypted_message = decrypt_mqtt_request(message.payload)
-                print(decrypted_message)
+                message_handler.add_cpu_data(decrypted_message)
     except Exception as e:
         logging.error(f"[MQTT-Listener Fehler] {e}")
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from schemas.users import UserCreationSchema
-from services.user_management import UserService
+from api.schemas.users import UserCreationSchema
+from api.services.user_management import UserService
 from jose import JWTError, jwt
 
 user_router = APIRouter(prefix="/users", tags=["users"])
