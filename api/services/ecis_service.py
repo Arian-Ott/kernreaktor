@@ -51,7 +51,7 @@ def derive_aes_key(shared_key: bytes) -> bytes:
     return HKDF(
         algorithm=hashes.SHA256(),
         length=32,
-        salt=settings.SECRET_KEY.encode(),
+        salt="".encode(),
         info=b'ecies-encryption',
     ).derive(shared_key)
 
