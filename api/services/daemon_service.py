@@ -12,6 +12,7 @@ from api.crud.daemons import (
 )
 from api.services.crypto_service import *
 
+
 def add_daemon(client_name, client_secret):
     """
     Add a new daemon.
@@ -24,6 +25,7 @@ def add_daemon(client_name, client_secret):
 
     # Create the daemon
     return create_daemon(client_name, hashed_client_secret)
+
 
 class DaemonService:
     def __init__(self, daemon_id):
@@ -45,7 +47,7 @@ class DaemonService:
         if client_name:
             # Check if the client name already exists
             existing_daemon = get_daemon_by_client_name(client_name)
-            if existing_daemon and existing_daemon['id'] != self.daemon_id:
+            if existing_daemon and existing_daemon["id"] != self.daemon_id:
                 raise ValueError("Client name already exists")
 
         if client_secret:
@@ -66,13 +68,12 @@ class DaemonService:
         Delete the daemon.
         """
         return delete_daemon(self.daemon_id)
-    
+
     def add_encryption_keypair(self, plain_public_key, plain_private_key):
         """
         Add an encryption keypair for the daemon.
         """
-        
-        
+
         encrypted_public_key = ecies_encrypt(plain_public_key.encode())
         encrypted_private_key = ecies_encrypt(plain_private_key.encode())
         add_encryption_keypair(
@@ -80,30 +81,23 @@ class DaemonService:
             public_key=encrypted_public_key,
             private_key=encrypted_private_key,
         )
+
     def add_encrypted_keypair(self, encrypted_data):
         """
         Add an encrypted keypair for the daemon.
         """
-        
+
         private_key = encrypted_data["private_key"]
         public_key = encrypted_data["public_key"]
-        private_key = urlsafe_b64decode(private_key).decode() 
+        private_key = urlsafe_b64decode(private_key).decode()
         public_key = urlsafe_b64decode(public_key).decode()
-        encrypted_data = {
-            "private_key": private_key,
-            "public_key": public_key
-        }
+        encrypted_data = {"private_key": private_key, "public_key": public_key}
         public_key = ecies_encrypt(encrypted_data["public_key"].encode())
         private_key = ecies_encrypt(encrypted_data["private_key"].encode())
-        encrypted_data = {
-            "private_key": private_key,
-            "public_key": public_key
-        }
-        
+        encrypted_data = {"private_key": private_key, "public_key": public_key}
+
         add_encryption_keypair(
             self.daemon_id,
             public_key=encrypted_data["public_key"],
             private_key=encrypted_data["private_key"],
         )
-            
-        
