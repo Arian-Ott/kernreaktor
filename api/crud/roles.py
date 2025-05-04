@@ -1,7 +1,7 @@
-from models.users import User, Roles, UserRoles
-from schemas.roles import RoleBaseSchema
-from db import get_db
-from crud.users import get_user
+from api.models.users import User, Roles, UserRoles
+from api.schemas.roles import RoleBaseSchema
+from api.db import get_db
+from api.crud.users import get_user
 
 
 def create_role(role: RoleBaseSchema):

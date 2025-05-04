@@ -1,5 +1,5 @@
-from db import get_db
-from models.users import User
+from api.db import get_db
+from api.models.users import User
 
 
 def get_user(user_id):

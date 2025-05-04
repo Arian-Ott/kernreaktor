@@ -2,11 +2,13 @@ from fastapi import APIRouter
 from hashlib import sha3_512
 from base64 import urlsafe_b64encode, urlsafe_b64decode
 from datetime import datetime
-from fastapi.responses import JSONResponse 
+from fastapi.responses import JSONResponse
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
-from schemas.ecis import EcisPublicKey
+from api.schemas.ecis import EcisPublicKey
+
 ecis_router = APIRouter(prefix="/ecis", tags=["ECIS"])
+
 
 @ecis_router.get("/public_key")
 async def get_public_key():
@@ -18,8 +20,12 @@ async def get_public_key():
     request_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open("keys/public.pem", "rb") as key_file:
         public_key = key_file.read()
-    public_key = urlsafe_b64encode(public_key).decode('utf-8')
-    return {"key": public_key, "sha3_512": sha3_512(f"{public_key}{request_time}".encode()).hexdigest(), "request_time": request_time}
+    public_key = urlsafe_b64encode(public_key).decode("utf-8")
+    return {
+        "key": public_key,
+        "sha3_512": sha3_512(f"{public_key}{request_time}".encode()).hexdigest(),
+        "request_time": request_time,
+    }
 
 
 @ecis_router.post("/verify_public_key")
@@ -30,20 +36,23 @@ async def verify_signature(data: EcisPublicKey):
     try:
         with open("keys/public.pem", "rb") as key_file:
             public_key = key_file.read()
-        public_key = urlsafe_b64encode(public_key).decode('utf-8')
+        public_key = urlsafe_b64encode(public_key).decode("utf-8")
         server_hash = sha3_512(f"{public_key}{data.request_time}".encode()).hexdigest()
         sha3_512_hash = sha3_512(f"{data.key}{data.request_time}".encode()).hexdigest()
-        
-        
-        if sha3_512_hash == data.sha3_512 and server_hash == data.sha3_512 and data.key == public_key:
+
+        if (
+            sha3_512_hash == data.sha3_512
+            and server_hash == data.sha3_512
+            and data.key == public_key
+        ):
             return JSONResponse(
                 status_code=200,
                 content={
                     "status": "success",
                     "message": "The integrity of the public key is verified. You can safely use it to encrypt your data.",
                     "public_key": public_key,
-                    "request_time": data.request_time
-                }
+                    "request_time": data.request_time,
+                },
             )
         else:
             raise HTTPException(
