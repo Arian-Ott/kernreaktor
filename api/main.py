@@ -8,10 +8,14 @@ from api.routes.oauth_routes import router as oauth_router
 from api.routes.user_routes import user_router
 from api.services.startup_service import startup_tasks
 from api.services.mqtt_service import mqtt_listener
-from api.routes.ecis_routes import ecis_router
-from api.routes.daemon_routes import daemon_router
+from routes.ecis_routes import ecis_router
+from routes.daemon_routes import daemon_router
+app = FastAPI(
+    debug=settings.DEBUG,
+    root_path="/api/v0"
+)
 
-app = FastAPI(debug=settings.DEBUG, root_path="/api/v0")
+
 
 # Routen registrieren
 app.include_router(oauth_router)
