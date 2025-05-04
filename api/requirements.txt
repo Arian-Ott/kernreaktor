@@ -9,4 +9,4 @@ passlib[argon2]
 python-jose[cryptography]
 tenacity
 paho-mqtt
-asyncio-mqtt
+aiomqtt
