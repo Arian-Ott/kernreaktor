@@ -1,4 +1,4 @@
-from config import settings
+from api.config import settings
 import asyncio
 import asyncio_mqtt
 

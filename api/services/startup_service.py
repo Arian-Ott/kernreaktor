@@ -1,8 +1,8 @@
-from crud.roles import create_role
-from models.users import User, UserRoles
-from schemas.roles import RoleBaseSchema
-from services.hash_utils import hash_password
-from db import get_db
+from api.crud.roles import create_role
+from api.models.users import User, UserRoles
+from api.schemas.roles import RoleBaseSchema
+from api.services.hash_utils import hash_password
+from api.db import get_db
 import logging
 
 

@@ -2,12 +2,12 @@ from fastapi import FastAPI
 import uvicorn
 import asyncio
 import asyncio_mqtt
-from config import settings
-from db import Base, engine
-from routes.oauth_routes import router as oauth_router
-from routes.user_routes import user_router
-from services.startup_service import startup_tasks
-from services.mqtt_service import mqtt_listener
+from api.config import settings
+from api.db import Base, engine
+from api.routes.oauth_routes import router as oauth_router
+from api.routes.user_routes import user_router
+from api.services.startup_service import startup_tasks
+from api.services.mqtt_service import mqtt_listener
 app = FastAPI(debug=settings.DEBUG, root_path="/api/v0")
 
 app.include_router(oauth_router)
