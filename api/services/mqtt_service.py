@@ -1,15 +1,19 @@
-from api.config import settings
 import asyncio
 import base64
-import logging
-from api.services import message_handler
-from base64 import urlsafe_b64encode, urlsafe_b64decode
-import aiomqtt
-from api.services.crypto_service import *
 import json
+import logging
+
+import aiomqtt
+
+from api.config import settings
+from api.services.crypto_service import decrypt, server_encrypt
+# from api.services import message_handler  # Uncomment if needed
 
 
 async def mqtt_listener():
+    """
+    Listens to MQTT topics and handles encrypted messages.
+    """
     try:
         async with aiomqtt.Client(
             hostname=settings.MQTT_BROKER,
@@ -21,44 +25,33 @@ async def mqtt_listener():
             await client.subscribe("kernreaktor/worker/#")
             await client.subscribe("kernreaktor/status/#")
 
-            # await client.publish("kernreaktor/status", b"kernreaktor-on")
-            enc = ecies_encrypt(b"Test")
-            enc = json.dumps(enc).encode()
+            # Example encrypted message publish
+            enc = json.dumps(server_encrypt("Test")).encode()
+            enc_b64 = base64.urlsafe_b64encode(enc)
+            await client.publish("kernreaktor/worker/", enc_b64)
 
-            enc = urlsafe_b64encode(enc)
-
-            await client.publish("kernreaktor/worker/", enc)
             async for message in client.messages:
-                decrypted_message = decrypt_mqtt_request(message.payload)
-                message_handler.add_cpu_data(decrypted_message)
+                decrypted = decrypt_mqtt_request(message.payload)
+                if decrypted:
+                    # Optionally handle message
+                    # await message_handler.handle(decrypted)
+                    print(f"Decrypted message: {decrypted.decode()}")
+
     except Exception as e:
         logging.error(f"[MQTT-Listener Fehler] {e}")
 
 
-def decrypt_mqtt_request(request: str) -> bytes:
+def decrypt_mqtt_request(request: bytes) -> bytes | None:
     """
     Decrypts the incoming MQTT request (Base64-encoded JSON).
-    Base64-decodes and prepares data for decryption.
     """
     try:
-        decoded_request = base64.urlsafe_b64decode(request)
-
-        # 2. JSON decode
-        data = json.loads(decoded_request.decode())
-
-        prepared_data = {
-            "ephemeral_public_key": base64.urlsafe_b64decode(
-                data["ephemeral_public_key"]
-            ),
-            "iv": base64.urlsafe_b64decode(data["iv"]),
-            "ciphertext": base64.urlsafe_b64decode(data["ciphertext"]),
-            "tag": base64.urlsafe_b64decode(data["tag"]),
-        }
-
-        return ecies_decrypt(prepared_data)
-
+        decoded_json = base64.urlsafe_b64decode(request).decode()
+        decrypted = decrypt(decoded_json.encode())
+        return decrypted
     except Exception as e:
         logging.error(f"[MQTT-Decrypt Fehler] {e}")
+        return None
 
 
 async def mqtt_publish(topic: str, payload: dict):
@@ -73,6 +66,9 @@ async def mqtt_publish(topic: str, payload: dict):
             # password=settings.MQTT_API_PASSWORD,
             keepalive=60,
         ) as client:
-            await client.publish(topic, payload)
+            payload_json = json.dumps(payload).encode()
+            encrypted = json.dumps(server_encrypt(payload_json)).encode()
+            encoded = base64.urlsafe_b64encode(encrypted)
+            await client.publish(topic, encoded)
     except Exception as e:
         logging.error(f"[MQTT-Publish Fehler] {e}")

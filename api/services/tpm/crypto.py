@@ -18,9 +18,7 @@ def encrypt(x_b64: str, y_b64: str, payload: str) -> str:
     y = base64.urlsafe_b64decode(y_b64)
 
     peer_public_numbers = ec.EllipticCurvePublicNumbers(
-        int.from_bytes(x, 'big'),
-        int.from_bytes(y, 'big'),
-        ec.SECP256R1()
+        int.from_bytes(x, "big"), int.from_bytes(y, "big"), ec.SECP256R1()
     )
     peer_public_key = peer_public_numbers.public_key(default_backend())
 
@@ -36,42 +34,41 @@ def encrypt(x_b64: str, y_b64: str, payload: str) -> str:
         algorithm=hashes.SHA256(),
         length=32,
         salt=None,
-        info=b'tpm encryption',
-        backend=default_backend()
+        info=b"tpm encryption",
+        backend=default_backend(),
     ).derive(shared_secret)
 
     # AES GCM Verschlüsselung
     iv = os.urandom(12)
     encryptor = Cipher(
-        algorithms.AES(aes_key),
-        modes.GCM(iv),
-        backend=default_backend()
+        algorithms.AES(aes_key), modes.GCM(iv), backend=default_backend()
     ).encryptor()
 
-    ciphertext = encryptor.update(payload.encode('utf-8')) + encryptor.finalize()
+    ciphertext = encryptor.update(payload.encode("utf-8")) + encryptor.finalize()
 
     tag = encryptor.tag
 
     # Exportiere Ephemeral Public Key
     ephemeral_public_bytes = ephemeral_public_key.public_bytes(
         encoding=serialization.Encoding.X962,
-        format=serialization.PublicFormat.UncompressedPoint
+        format=serialization.PublicFormat.UncompressedPoint,
     )
 
     result = {
         "ephemeral_pub": base64.urlsafe_b64encode(ephemeral_public_bytes).decode(),
         "iv": base64.urlsafe_b64encode(iv).decode(),
         "ct": base64.urlsafe_b64encode(ciphertext).decode(),
-        "tag": base64.urlsafe_b64encode(tag).decode()
+        "tag": base64.urlsafe_b64encode(tag).decode(),
     }
 
-    return base64.urlsafe_b64encode(json.dumps(result).encode('utf-8')).decode('utf-8')
+    return base64.urlsafe_b64encode(json.dumps(result).encode("utf-8")).decode("utf-8")
+
 
 def decrypt(private_key_handle: ESYS_TR, payload: str) -> dict:
     """
     Decrypts payload using TPM's private ECC key via ECDH.
     """
-    decoded = base64.urlsafe_b64decode(payload.encode('utf-8'))
+    decoded = base64.urlsafe_b64decode(payload.encode("utf-8"))
     data = json.loads(decoded)
 
     ephemeral_pub = base64.urlsafe_b64decode(data["ephemeral_pub"])
@@ -88,8 +85,7 @@ def decrypt(private_key_handle: ESYS_TR, payload: str) -> dict:
     # Build TPM2B_ECC_POINT
     in_point = TPM2B_ECC_POINT(
         point=TPMS_ECC_POINT(
-            x=TPM2B_ECC_PARAMETER(buffer=x),
-            y=TPM2B_ECC_PARAMETER(buffer=y)
+            x=TPM2B_ECC_PARAMETER(buffer=x), y=TPM2B_ECC_PARAMETER(buffer=y)
         )
     )
 
@@ -103,16 +99,14 @@ def decrypt(private_key_handle: ESYS_TR, payload: str) -> dict:
         algorithm=hashes.SHA256(),
         length=32,
         salt=None,
-        info=b'tpm encryption',
-        backend=default_backend()
+        info=b"tpm encryption",
+        backend=default_backend(),
     ).derive(shared_secret)
 
     decryptor = Cipher(
-        algorithms.AES(aes_key),
-        modes.GCM(iv, tag),
-        backend=default_backend()
+        algorithms.AES(aes_key), modes.GCM(iv, tag), backend=default_backend()
     ).decryptor()
 
     plaintext = decryptor.update(ciphertext) + decryptor.finalize()
 
-    return json.loads(plaintext.decode('utf-8'))
+    return json.loads(plaintext.decode("utf-8"))

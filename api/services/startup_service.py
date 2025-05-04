@@ -1,14 +1,13 @@
-
 from api.crud.roles import *
 
 from api.models.users import User, UserRoles
 from api.schemas.roles import RoleBaseSchema
 from api.services.hash_utils import hash_password
-from api.db import get_db
-
+from api.db import get_db, Base, engine
+from api.services.crypto_service import generate_keys
 import logging
 import os
-
+from pathlib import Path
 
 
 def create_roles():
@@ -52,29 +51,20 @@ def create_admin_user():
             logging.error(f"Error assigning admin role to user: {e}")
 
 
-def create_encryption_keypair():
-    if os.path.exists("keys/private.pem") and os.path.exists("keys/public.pem"):
-        logging.info("Encryption keypair already exists.")
-        return
-    os.makedirs("keys", exist_ok=True)
-    private_key, public_key = generate_ec_key_pair()
-
-    with open("keys/private.key", "wb") as f:
-        f.write(
-            private_key.private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.PKCS8,
-                encryption_algorithm=serialization.NoEncryption(),
-            )
-        )
-
-    with open("keys/public.pem", "wb") as f:
-        f.write(
-            public_key.public_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.SubjectPublicKeyInfo,
-            )
-        )
+def key_generation():
+    if not os.path.exists(Path(__file__).parent.parent / "keys"):
+        os.makedirs(Path(__file__).parent.parent / "keys")
+    if not os.path.exists(
+        Path(__file__).parent.parent / "keys/private_key.pem"
+    ) and not os.path.exists(Path(__file__).parent.parent / "keys/public_key.pem"):
+        try:
+            private, public = generate_keys()
+            with open(Path(__file__).parent.parent / "keys/private_key.pem", "wb") as f:
+                f.write(private)
+            with open(Path(__file__).parent.parent / "keys/public_key.pem", "wb") as f:
+                f.write(public)
+        except Exception as e:
+            logging.error(f"Error generating keys: {e}")
 
 
 def startup_tasks():
@@ -82,7 +72,7 @@ def startup_tasks():
     Startup tasks for the FastAPI application.
     This function is called when the application starts.
     """
-    Base.metadata.create_all(bind=engine)   
-    create_encryption_keypair()
+    Base.metadata.create_all(bind=engine)
+    key_generation()
     create_roles()
     create_admin_user()
