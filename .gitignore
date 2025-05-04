@@ -10,6 +10,7 @@ htmlcov
 venv
 
 api/keys/public.pem
-api/keys/private.key
+api/keys/private.pem
 mosquitto/log
 mosquitto/data
+**/*.pem
