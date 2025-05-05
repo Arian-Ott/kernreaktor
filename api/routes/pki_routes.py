@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 from api.schemas.ecis import EcisPublicKey
 
-ecis_router = APIRouter(prefix="/ecis", tags=["ECIS"])
+ecis_router = APIRouter(prefix="/pki", tags=["PKI"])
 
 
 @ecis_router.get("/public_key")
