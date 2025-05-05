@@ -47,3 +47,19 @@ async def new_daemon(
         return {"daemon": daemon}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@daemon_router.delete("/{daemon_id}")
+async def delete_daemon(daemon_id: str, jwt: str = Depends(oauth2_scheme)):
+    """
+    Delete a daemon by ID.
+    """
+    user = get_current_user(token=jwt)
+
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    try:
+        DaemonService(UUID(daemon_id)).delete_daemon()
+        return {"status": "success", "message": "Daemon deleted successfully"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
