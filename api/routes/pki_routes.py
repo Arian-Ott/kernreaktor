@@ -7,10 +7,10 @@ from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 from api.schemas.ecis import EcisPublicKey
 
-ecis_router = APIRouter(prefix="/pki", tags=["PKI"])
+pki_router = APIRouter(prefix="/pki", tags=["PKI"])
 
 
-@ecis_router.get("/public_key")
+@pki_router.get("/public_key")
 async def get_public_key():
     """
     Retrieve the public key and its SHA3-512 hash.
@@ -28,7 +28,7 @@ async def get_public_key():
     }
 
 
-@ecis_router.post("/verify_public_key")
+@pki_router.post("/verify_public_key")
 async def verify_signature(data: EcisPublicKey):
     """
     Verify the SHA3-512 hash of the public key.
