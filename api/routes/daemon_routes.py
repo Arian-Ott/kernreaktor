@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from api.routes.oauth_routes import oauth2_scheme, get_current_user
 from api.services.daemon_service import DaemonService, create_daemon
+from api.schemas.daemon import DaemonCreationSchema, DaemonIDSchema
 from uuid import UUID
 
 daemon_router = APIRouter(prefix="/daemon", tags=["Daemon"])
@@ -27,14 +28,16 @@ async def get_daemon(daemon_id: str, jwt: str = Depends(oauth2_scheme)):
     user = get_current_user(token=jwt)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    daemon = DaemonService(UUID(daemon_id)).get_daemon()
-    del daemon["client_secret"]
+    try:
+        daemon = DaemonService(UUID(daemon_id)).get_daemon()
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     return {"daemon": daemon}
 
 
 @daemon_router.post("/")
 async def new_daemon(
-    client_name: str, client_secret: str, jwt: str = Depends(oauth2_scheme)
+    daemon: DaemonCreationSchema, jwt: str = Depends(oauth2_scheme)
 ):
     """
     Create a new daemon.
@@ -43,13 +46,13 @@ async def new_daemon(
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     try:
-        daemon = create_daemon(client_name, client_secret)
+        daemon = create_daemon(daemon.client_name, daemon.client_secret)
         return {"daemon": daemon}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @daemon_router.delete("/{daemon_id}")
-async def delete_daemon(daemon_id: str, jwt: str = Depends(oauth2_scheme)):
+async def delete_daemon(daemon_id:str, jwt: str = Depends(oauth2_scheme)):
     """
     Delete a daemon by ID.
     """
