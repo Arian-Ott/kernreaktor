@@ -36,9 +36,7 @@ async def get_daemon(daemon_id: str, jwt: str = Depends(oauth2_scheme)):
 
 
 @daemon_router.post("/")
-async def new_daemon(
-    daemon: DaemonCreationSchema, jwt: str = Depends(oauth2_scheme)
-):
+async def new_daemon(daemon: DaemonCreationSchema, jwt: str = Depends(oauth2_scheme)):
     """
     Create a new daemon.
     """
@@ -51,8 +49,9 @@ async def new_daemon(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
 @daemon_router.delete("/{daemon_id}")
-async def delete_daemon(daemon_id:str, jwt: str = Depends(oauth2_scheme)):
+async def delete_daemon(daemon_id: str, jwt: str = Depends(oauth2_scheme)):
     """
     Delete a daemon by ID.
     """
@@ -65,4 +64,3 @@ async def delete_daemon(daemon_id:str, jwt: str = Depends(oauth2_scheme)):
         return {"status": "success", "message": "Daemon deleted successfully"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
