@@ -19,7 +19,7 @@ async def get_all_daemons(jwt: str = Depends(oauth2_scheme)):
     return {"daemons": daemon}
 
 
-@daemon_router.get("/daemon/{daemon_id}")
+@daemon_router.get("/{daemon_id}")
 async def get_daemon(daemon_id: str, jwt: str = Depends(oauth2_scheme)):
     """
     Get a daemon by ID.
@@ -32,7 +32,7 @@ async def get_daemon(daemon_id: str, jwt: str = Depends(oauth2_scheme)):
     return {"daemon": daemon}
 
 
-@daemon_router.post("/daemon")
+@daemon_router.post("/")
 async def new_daemon(
     client_name: str, client_secret: str, jwt: str = Depends(oauth2_scheme)
 ):
