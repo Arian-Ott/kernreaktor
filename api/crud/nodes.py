@@ -1,3 +1,4 @@
+"""
 from sqlalchemy.orm import Session
 from api.models.environment import (
     Environment,
@@ -95,3 +96,4 @@ def create_status_snapshot(
     db.commit()
     db.refresh(snapshot)
     return snapshot
+"""

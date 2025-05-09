@@ -8,8 +8,10 @@ from api.routes.oauth_routes import router as oauth_router
 from api.routes.user_routes import user_router
 from api.services.startup_service import startup_tasks
 from api.services.mqtt_service import mqtt_listener
-from api.routes.ecis_routes import ecis_router
+from api.routes.pki_routes import pki_router
 from api.routes.daemon_routes import daemon_router
+from api.routes.mqtt_route import mqtt_router
+from api.routes.pve_routes import pve_router
 
 app = FastAPI(debug=settings.DEBUG, root_path="/api/v0")
 
@@ -17,8 +19,10 @@ app = FastAPI(debug=settings.DEBUG, root_path="/api/v0")
 # Routen registrieren
 app.include_router(oauth_router)
 app.include_router(user_router)
-app.include_router(ecis_router)
+app.include_router(pki_router)
 app.include_router(daemon_router)
+app.include_router(mqtt_router)
+app.include_router(pve_router)
 
 
 # Startup Routine

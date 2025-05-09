@@ -4,6 +4,10 @@ services:
     container_name: reaktor
     ports:
       - "52345:52345"
+
+
+
+     
       
     depends_on:
       - maria
