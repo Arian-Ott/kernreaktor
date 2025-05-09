@@ -9,7 +9,6 @@
         build-essential \
         && rm -rf /var/lib/apt/lists/*
     
-  
     COPY requirements.txt .
     RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
     
