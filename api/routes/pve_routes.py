@@ -77,6 +77,7 @@ async def get_node(node_id: str, db: Session = Depends(get_db)):
 async def update_node(
     node_id: str, data: schemas.NodeUpdate, db: Session = Depends(get_db)
 ):
+    node_id = UUID(node_id)
     updated = PveService.update_node(db, node_id, data)
     if not updated:
         raise HTTPException(status_code=404, detail="Node not found")
@@ -85,6 +86,7 @@ async def update_node(
 
 @pve_router.delete("/nodes/{node_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_node(node_id: str, db: Session = Depends(get_db)):
+    node_id = UUID(node_id)
     if not PveService.delete_node(db, node_id):
         raise HTTPException(status_code=404, detail="Node not found")
 
