@@ -1,5 +1,5 @@
 # ----------- Build Stage -----------
-    FROM python:3.12-slim-bullseye AS builder
+    FROM python:3.12-slim-bookworm AS builder
 
 
     RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -13,7 +13,7 @@
     RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
     
     # ----------- Final Image -----------
-    FROM python:3.12-slim-bullseye
+    FROM python:3.12-slim-bookworm
     
    
     COPY --from=builder /install /usr/local
