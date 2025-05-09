@@ -4,7 +4,6 @@ from api.models.users import User, UserRoles
 from api.schemas.roles import RoleBaseSchema
 from api.services.hash_utils import hash_password
 from api.db import get_db, Base, engine
-from api.services.crypto_service import generate_keys
 import logging
 import os
 from pathlib import Path
@@ -51,20 +50,6 @@ def create_admin_user():
             logging.error(f"Error assigning admin role to user: {e}")
 
 
-def key_generation():
-    if not os.path.exists(Path(__file__).parent.parent / "keys"):
-        os.makedirs(Path(__file__).parent.parent / "keys")
-    if not os.path.exists(
-        Path(__file__).parent.parent / "keys/private_key.pem"
-    ) and not os.path.exists(Path(__file__).parent.parent / "keys/public_key.pem"):
-        try:
-            private, public = generate_keys()
-            with open(Path(__file__).parent.parent / "keys/private_key.pem", "wb") as f:
-                f.write(private)
-            with open(Path(__file__).parent.parent / "keys/public_key.pem", "wb") as f:
-                f.write(public)
-        except Exception as e:
-            logging.error(f"Error generating keys: {e}")
 
 
 def startup_tasks():
@@ -73,6 +58,5 @@ def startup_tasks():
     This function is called when the application starts.
     """
     Base.metadata.create_all(bind=engine)
-    key_generation()
     create_roles()
     create_admin_user()
