@@ -11,7 +11,7 @@ services:
       
     depends_on:
       - maria
-      - mqtt
+   
     
     env_file:
       - .env
@@ -44,19 +44,6 @@ services:
       - "8080:80"
     depends_on:
       - maria
-    networks:
-      - reaktor-net
-
-  mqtt:
-    image: eclipse-mosquitto:latest
-    container_name: reaktor-mqtt
-    ports:
-      - "1883:1883"
-      - "9001:9001"
-    volumes:
-      - ./mosquitto/config:/mosquitto/config
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
     networks:
       - reaktor-net
     
